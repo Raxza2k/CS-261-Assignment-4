@@ -1,8 +1,8 @@
 /*
  * CS 261 Data Structures
  * Assignment 5
- * Name: 
- * Date: 
+ * Name: Cooper Smith, Anthony Minniti, Gabe Schafman
+ * Date: 05/08/19
  */
 
 #include "hashMap.h"
@@ -83,6 +83,15 @@ void hashMapInit(HashMap* map, int capacity)
  */
 void hashMapCleanUp(HashMap* map)
 {
+    HashLink* cur, temp;
+    for(int i = 0; i < map->capacity; i++){
+        cur = map->table[i]->next;
+        while(cur != NULL){
+            temp = cur->next;
+            hashLinkDelete(cur);
+            cur = temp;
+        }
+    }
     // FIXME: implement
 }
 
@@ -113,33 +122,59 @@ void hashMapDelete(HashMap* map)
 /**
  * Returns a pointer to the value of the link with the given key  and skip traversing as well. Returns NULL
  * if no link with that key is in the table.
- * 
+ *
  * Use HASH_FUNCTION(key) and the map's capacity to find the index of the
  * correct linked list bucket. Also make sure to search the entire list.
- * 
+ *
  * @param map
  * @param key
  * @return Link value or NULL if no matching link.
  */
 int* hashMapGet(HashMap* map, const char* key)
 {
+    int* temp;
+    HashLink* ptr;
+
+    for(int i = 0; i < map->capacity; i++){     //iterates through every bucket
+        ptr = map->table[i]->next;              //starts iterating at the first link after the bucket
+        while(ptr != NULL){                     //if not at the end of each bucket linked list
+            if(strcmp(HASH_FUNCTION(key), HASH_FUNCTION(ptr->key)) != 0){           //converts both keys to ints and compares the values, if they're not equal moves pointer to next link
+                ptr = ptr->next;
+            }
+            else {                                  //if the key values are equal, copies link value to temp pointer
+                temp = &(ptr->value);
+                return temp;                        //returns temp pointer to value in desired link
+            }
+        }
+    }
     // FIXME: implement
-    return NULL;
+    return NULL;                //if key doesn't match any in table, returns NULL
 }
 
 /**
- * Resizes the hash table to have a number of buckets equal to the given 
- * capacity (double of the old capacity). After allocating the new table, 
+ * Resizes the hash table to have a number of buckets equal to the given
+ * capacity (double of the old capacity). After allocating the new table,
  * all of the links need to rehashed into it because the capacity has changed.
- * 
+ *
  * Remember to free the old table and any old links if you use hashMapPut to
  * rehash them.
- * 
+ *
  * @param map
  * @param capacity The new number of buckets.
  */
 void resizeTable(HashMap* map, int capacity)
 {
+    HashMap* newMap = hashMapNew(capacity);     //create new map with new capacity
+
+    HashLink* ptr;
+
+    for(int i = 0; i < map->capacity; i++){             //iterates through old map buckets
+        ptr = map->table[i]->next;
+        while(ptr != NULL){                             //iterates through the linked list in each bucket
+            hashMapPut(newMap, ptr->key, ptr->value);   //puts every link node in the new map
+        }
+    }
+    hashMapDelete(map);    //delete old map
     // FIXME: implement
 }
 
@@ -148,16 +183,36 @@ void resizeTable(HashMap* map, int capacity)
  * key already exists, this will just update the value and skip traversing. Otherwise, it will
  * create a new link with the given key and value and add it to the table
  * bucket's linked list. You can use hashLinkNew to create the link.
- * 
+ *
  * Use HASH_FUNCTION(key) and the map's capacity to find the index of the
  * correct linked list bucket.
- * 
+ *
  * @param map
  * @param key
  * @param value
  */
 void hashMapPut(HashMap* map, const char* key, int value)
 {
+    HashLink* ptr;
+    int idx = abs((HASH_FUNCTION(key)) % (map->capacity));          //determines index for new value to be placed
+
+    for(int i = 0; i < map->capacity; i++){     //iterates through every bucket
+        if(i == idx && map->table[i]->next != NULL){
+            ptr = map->table[i]->next;              //starts iterating at the first link after the bucket
+            while(ptr != NULL){                     //if not at the end of each bucket linked list
+                if(strcmp(HASH_FUNCTION(key), HASH_FUNCTION(ptr->key)) != 0){           //converts both keys to ints and compares the values, if they're not equal moves pointer to next link
+                    ptr = ptr->next;
+                }
+                else if(strcmp(HASH_FUNCTION(key), HASH_FUNCTION(ptr->key)) == 0){                                  //if the key values are equal, copies value to link value variable
+                    ptr->value = value;
+                }
+            }
+            if(ptr == NULL){
+                ptr = map->table[i]->next;
+                hashLinkNew(key, value, ptr->next);
+            }
+        }
+    }
     // FIXME: implement
 }
 
@@ -170,23 +225,51 @@ void hashMapPut(HashMap* map, const char* key, int value)
  */
 void hashMapRemove(HashMap* map, const char* key)
 {
+    HashLink* cur, tmp;
+    for(int i = 0; i < map-> capacity; i ++){
+        cur = map->table[i]->next;
+        if(HASH_FUNCTION(cur->key) == HASH_FUNCTION(key)){
+            map->table[i]->next = cur->next;
+            hashLinkDelete(cur);
+        }
+        while(cur != NULL){
+            if(HASH_FUNCTION(cur->next->key) == HASH_FUNCTION(key)){
+                temp = cur->next->next;
+                hashLinkDelete(cur->next);
+                cur->next = temp;
+            }
+        }
+    }
     // FIXME: implement
 }
 
 /**
  * Returns 1 if a link with the given key is in the table and 0 otherwise.
- * 
+ *
  * Use HASH_FUNCTION(key) and the map's capacity to find the index of the
  * correct linked list bucket. Also make sure to search the entire list.
- * 
+ *
  * @param map
  * @param key
  * @return 1 if the key is found, 0 otherwise.
  */
 int hashMapContainsKey(HashMap* map, const char* key)
 {
+    HashLink* ptr;
+
+    for(int i = 0; i < map->capacity; i++){     //iterates through every bucket
+        ptr = map->table[i]->next;              //starts iterating at the first link after the bucket
+        while(ptr != NULL){                     //if not at the end of each bucket linked list
+            if(strcmp(HASH_FUNCTION(key), HASH_FUNCTION(ptr->key)) != 0){           //converts both keys to ints and compares the values, if they're not equal moves pointer to next link
+                ptr = ptr->next;
+            }
+            else {                                  //if the key values are equal
+                return 1;
+            }
+        }
+    }
     // FIXME: implement
-    return 0;
+    return 0;           //link is not in the table
 }
 
 /**
@@ -197,7 +280,7 @@ int hashMapContainsKey(HashMap* map, const char* key)
 int hashMapSize(HashMap* map)
 {
     // FIXME: implement
-    return 0;
+    return (map->size);
 }
 
 /**
@@ -208,7 +291,7 @@ int hashMapSize(HashMap* map)
 int hashMapCapacity(HashMap* map)
 {
     // FIXME: implement
-    return 0;
+    return (map->capacity);
 }
 
 /**
@@ -218,8 +301,14 @@ int hashMapCapacity(HashMap* map)
  */
 int hashMapEmptyBuckets(HashMap* map)
 {
+    int i, j;
+    j = 0;
+    for(i = 0; i < map->capacity; i++){
+        if(map->table[i] == NULL)
+            j++;
+    }
     // FIXME: implement
-    return 0;
+    return j;
 }
 
 /**
@@ -232,8 +321,9 @@ int hashMapEmptyBuckets(HashMap* map)
  */
 float hashMapTableLoad(HashMap* map)
 {
+    float load = ((float)map->size) / ((float)map->capacity);
     // FIXME: implement
-    return 0;
+    return load;
 }
 
 /**
@@ -242,7 +332,15 @@ float hashMapTableLoad(HashMap* map)
  */
 void hashMapPrint(HashMap* map)
 {
+    HashLink* temp;
+    for(int i = 0; i < map->capacity; i++){
+        temp = map->table[i]->next;
+        while(temp != NULL){
+            printf("%d \t \n", temp->value);
+            temp = temp->next;
+        }
+    }
   // FIXME: implement
 
-   
+
 }
