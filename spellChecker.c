@@ -123,11 +123,8 @@ int main(int argc, const char** argv)
     // FIXME: implement
     HashMap* map = hashMapNew(1000);
     HashLink* cur1, cur2;
-    int moves;
+    int moves, notWord;
 
-    while(argc > 2){
-        printf("Too many command line arguments, please type only one word. \n");
-    }
 
     FILE* file = fopen("dictionary.txt", "r");
     clock_t timer = clock();
@@ -142,50 +139,60 @@ int main(int argc, const char** argv)
     {
         printf("Enter a word or \"quit\" to quit: ");
         scanf("%s", inputBuffer);
-        char tmp;
-        while(inputBuffer){         //puts user inputted word to lower case to aid comparisons
-            tolower(tmp);
-        }
-
-        int matching;
-        for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
-            cur1 = map->table[i]->next;
-            while(cur1 != NULL){
-                moves = leDist(word, cur1->key);  //not sure how to catch the return...maybe a hash map link
-                if(moves == 0){
-                    matching = 1;
-                    printf("The word "%s" is spelled correctly. \n", inputBuffer);
-                }
-                else{
-                    matching = 0;
-                    cur1->value = moves;
-                }
-                cur1 = cur1->next;
+        char* tmp;
+        for(tmp = inputBuffer; tmp < strlen(inputBuffer); tmp++){         //puts user inputted word to lower case to aid comparisons
+            if(!isalpha(*tmp)){
+                notWord = 1;
+            }
+            else{
+                tmp = tolower(*tmp);
+                notWord = 0;
             }
         }
 
-        if(matching == 0){
-            int count = 0;
-            HashLink* minArr[5];        //creates hashlink array to hold the locations of the five closest words
-            for(int j = 0; j < map->capacity; j++){
-                cur2 = map->table[j]->next;
-                while(cur2 != NULL){
-                    if(count < 5){      //fills the array with the first five words
-                        minArr[count] = cur2;
-                        count++;
+        if(notWord == 0){
+            
+            int matching;
+            for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
+                cur1 = map->table[i]->next;
+                while(cur1 != NULL){
+                    moves = leDist(word, cur1->key);  //not sure how to catch the return...maybe a hash map link
+                    if(moves == 0){
+                        matching = 1;
+                        printf("The word "%s" is spelled correctly. \n", inputBuffer);
                     }
                     else{
-                        for(int k = 0; k < 5; k++){     //compares every word distance with distances in the array
-                            if(cur2->value < minArr[k]){
-                                minArr[k] = cur2;       //once a new distance is placed in an array location, jump out of array comparison loop
-                                break;
+                        matching = 0;
+                        cur1->value = moves;
+                    }
+                    cur1 = cur1->next;
+                }
+            }
+
+            if(matching == 0){
+                int count = 0;
+                HashLink* minArr[5];        //creates hashlink array to hold the locations of the five closest words
+                for(int j = 0; j < map->capacity; j++){
+                    cur2 = map->table[j]->next;
+                    while(cur2 != NULL){
+                        if(count < 5){      //fills the array with the first five words
+                            minArr[count] = cur2;
+                            count++;
+                        }
+                        else{
+                            for(int k = 0; k < 5; k++){     //compares every word distance with distances in the array
+                                if(cur2->value < minArr[k]){
+                                    minArr[k] = cur2;       //once a new distance is placed in an array location, jump out of array comparison loop
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+                printf("The inputted word:%s, is spelled incorrectly, did you mean; %s, %s, %s, %s, %s?\n", inputBuffer, minArr[0], minArr[1], minArr[2], minArr[3], minArr[4]);
             }
-            printf("The inputted word:%s, is spelled incorrectly, did you mean; %s, %s, %s, %s, %s?\n", inputBuffer, minArr[0], minArr[1], minArr[2], minArr[3], minArr[4]);
         }
+
         // Implement the spell checker code here..
 
         if (strcmp(inputBuffer, "quit") == 0)
