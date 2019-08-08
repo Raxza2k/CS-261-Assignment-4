@@ -125,6 +125,10 @@ int main(int argc, const char** argv)
     HashLink* cur1, cur2;
     int moves;
 
+    while(argc > 2){
+        printf("Too many command line arguments, please type only one word. \n");
+    }
+
     FILE* file = fopen("dictionary.txt", "r");
     clock_t timer = clock();
     loadDictionary(file, map);
