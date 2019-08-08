@@ -17,14 +17,13 @@ char* nextWord(FILE* file)
     int maxLength = 16;
     int length = 0;
     char* word = malloc(sizeof(char) * maxLength);
-//Fix me: Do the necessary change to make the implementation //case-insensitive  
-   while (1) 
+//Fix me: Do the necessary change to make the implementation //case-insensitive
+   while (1)
     {
         char c = fgetc(file);
-        if ((c >= '0' && c <= '9') ||
-            (c >= 'A' && c <= 'Z') ||
+        if ((c >= 'A' && c <= 'Z') ||
             (c >= 'a' && c <= 'z') ||
-            c == '\'')  
+            c == '\'')
         {
             if (length + 1 >= maxLength)
             {
@@ -32,6 +31,9 @@ char* nextWord(FILE* file)
                 word = realloc(word, maxLength);
             }
             // .............
+            if(c >= 'A' && c <= 'Z'){
+                c += 32;
+            }
             word[length] = c;
             length++;
         }
@@ -66,24 +68,51 @@ int main(int argc, const char** argv)
         fileName = argv[1];
     }
     printf("Opening file: %s\n", fileName);
-    
+
+    char* word;
+
     clock_t timer = clock();
-    
+
     HashMap* map = hashMapNew(10);
-    
+    HashLink* ptr;
+
     // --- Concordance code begins here ---
+    word = nextWord(fileName);
+    while(word != NULL){
+        int idx = abs(HASH_FUNCTION(word)) % map->capacity;
+        ptr = map->table[idx]->next;
+        while(ptr != NULL){
+            if(strcmp(word, ptr->key) == 0){
+                ptr->value++;
+                break;
+            }
+            else{
+                ptr = ptr->next;
+                if(ptr->next == NULL){
+                    struct HashLink* newLink = malloc(struct HashLink*);
+                    newLink->value = 1;
+                    newLink->key = word;
+                    newLink->next = NULL;
+                    ptr->next = newLink;
+                    break;
+                }
+            }
+        }
+
+    }
+
     // Be sure to free the word after you are done with it here.
     // --- Concordance code ends here ---
-    
-    
-    
+
+
+
     timer = clock() - timer;
     printf("\nRan in %f seconds\n", (float)timer / (float)CLOCKS_PER_SEC);
     printf("Empty buckets: %d\n", hashMapEmptyBuckets(map));
     printf("Number of links: %d\n", hashMapSize(map));
     printf("Number of buckets: %d\n", hashMapCapacity(map));
     printf("Table load: %f\n", hashMapTableLoad(map));
-    
+
     hashMapDelete(map);
     return 0;
 }
