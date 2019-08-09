@@ -68,15 +68,17 @@ int main(int argc, const char** argv)
     }
     printf("Opening file: %s\n", fileName);
 
+    FILE* file = fopen(fileName, "r");
+
     char* word;
 
     clock_t timer = clock();
 
     HashMap* map = hashMapNew(10);
-    //HashLink* ptr;
+    HashLink* ptr;
 
     // --- Concordance code begins here ---
-    word = nextWord(fileName);
+    word = nextWord(file);
     while(word != NULL){
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
         ptr = map->table[idx]->next;
@@ -98,7 +100,7 @@ int main(int argc, const char** argv)
                 }
             }
         }
-        word = nextWord(fileName);
+        word = nextWord(file);
 
     }
     free(word);
@@ -106,7 +108,7 @@ int main(int argc, const char** argv)
     // Be sure to free the word after you are done with it here.
     // --- Concordance code ends here ---
 
-
+    fclose(file);
 
     timer = clock() - timer;
     printf("\nRan in %f seconds\n", (float)timer / (float)CLOCKS_PER_SEC);
