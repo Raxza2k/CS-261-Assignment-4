@@ -22,8 +22,7 @@ char* nextWord(FILE* file)
     {
         char c = fgetc(file);
         if ((c >= 'A' && c <= 'Z') ||
-            (c >= 'a' && c <= 'z') ||
-            c == '\'')
+            (c >= 'a' && c <= 'z'))
         {
             if (length + 1 >= maxLength)
             {
@@ -37,7 +36,7 @@ char* nextWord(FILE* file)
             word[length] = c;
             length++;
         }
-        else if (length > 0 || c == EOF)
+        else if (length > 0 || c == EOF || !isalpha(c))
         {
             break;
         }
@@ -74,7 +73,7 @@ int main(int argc, const char** argv)
     clock_t timer = clock();
 
     HashMap* map = hashMapNew(10);
-    HashLink* ptr;
+    //HashLink* ptr;
 
     // --- Concordance code begins here ---
     word = nextWord(fileName);
@@ -89,18 +88,21 @@ int main(int argc, const char** argv)
             else{
                 ptr = ptr->next;
                 if(ptr->next == NULL){
-                    struct HashLink* newLink = malloc(struct HashLink*);
+                /*    struct HashLink* newLink = malloc(struct HashLink*);
                     newLink->value = 1;
                     newLink->key = word;
                     newLink->next = NULL;
-                    ptr->next = newLink;
+                    ptr->next = newLink; */
+                    hashMapPut(map, word, 1);
                     break;
                 }
             }
         }
+        word = nextWord(fileName);
 
     }
-
+    free(word);
+    hashMapPrint(map);
     // Be sure to free the word after you are done with it here.
     // --- Concordance code ends here ---
 
