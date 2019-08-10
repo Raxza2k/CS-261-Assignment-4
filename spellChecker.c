@@ -52,7 +52,7 @@ char* nextWord(FILE* file)
  * @param file
  * @param map
  */
-void loadDictionary(FILE* file, HashMap* map)
+void loadDictionary(FILE* file, struct HashMap* map)
 {
     char* word = nextWord(file);
     while(word != NULL){
@@ -77,7 +77,7 @@ int minMoves(int a, int b, int c){
     return c;
 }
 
-HashLink* leDist(const char* input, const char* key){   //returns the pointer to the link that contains the matching word?
+struct HashLink* leDist(const char* input, const char* key){   //returns the pointer to the link that contains the matching word?
     int inLen, keyLen;
     inLen = strlen(input);
     keyLen = strlen(key);
@@ -121,8 +121,9 @@ HashLink* leDist(const char* input, const char* key){   //returns the pointer to
 int main(int argc, const char** argv)
 {
     // FIXME: implement
-    HashMap* map = hashMapNew(1000);
-    HashLink* cur1, cur2;
+    struct HashMap* map = hashMapNew(1000);
+    struct HashLink* cur1;
+    struct HashLink* cur2;
     int moves, notWord;
 
 
@@ -151,7 +152,7 @@ int main(int argc, const char** argv)
         }
 
         if(notWord == 0){
-            
+
             int matching;
             for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
                 cur1 = map->table[i]->next;
@@ -159,7 +160,7 @@ int main(int argc, const char** argv)
                     moves = leDist(word, cur1->key);  //not sure how to catch the return...maybe a hash map link
                     if(moves == 0){
                         matching = 1;
-                        printf("The word "%s" is spelled correctly. \n", inputBuffer);
+                        printf("The word \"%s\" is spelled correctly. \n", inputBuffer);
                     }
                     else{
                         matching = 0;
@@ -171,7 +172,7 @@ int main(int argc, const char** argv)
 
             if(matching == 0){
                 int count = 0;
-                HashLink* minArr[5];        //creates hashlink array to hold the locations of the five closest words
+                struct HashLink* minArr[5];        //creates hashlink array to hold the locations of the five closest words
                 for(int j = 0; j < map->capacity; j++){
                     cur2 = map->table[j]->next;
                     while(cur2 != NULL){
