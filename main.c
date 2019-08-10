@@ -81,26 +81,21 @@ int main(int argc, const char** argv)
     while(word != NULL){
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
         ptr = map->table[idx];
-        while(ptr != NULL){
-            if(strcmp(word, ptr->key) == 0){
-                ptr->value++;
-                break;
-            }
-            else{
-                ptr = ptr->next;
-                if(ptr->next == NULL){
-                /*    struct HashLink* newLink = malloc(struct HashLink*);
-                    newLink->value = 1;
-                    newLink->key = word;
-                    newLink->next = NULL;
-                    ptr->next = newLink; */
-                    hashMapPut(map, word, 1);
-                    break;
+        printf("Adding word: %s\n", word);
+        printf("Initial idx: %d\n", idx);
+        printf("Initial pointer: %p\n", ptr);
+            while(ptr != NULL){
+                if(strcmp(word, ptr->key) == 0){
+                    ptr->value++;
+                }
+                else{
+                    ptr = ptr->next;
                 }
             }
-        }
+            if(ptr == NULL){
+                hashMapPut(map, word, 1);
+            }
         word = nextWord(file);
-
     }
     free(word);
     hashMapPrint(map);

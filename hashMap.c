@@ -73,8 +73,7 @@ void hashMapInit(struct HashMap* map, int capacity)
     for (int i = 0; i < capacity; i++)  //Set all table pointers to NULL.
     {
         map->table[i] = NULL;
-        if(map->table[i] == NULL)
-            printf("bucket  %d  is NULL\n", i);
+        if(map->table[i] == NULL);
     }
 }
 
@@ -208,10 +207,11 @@ printf("curLink key is: %s, prevLink key is: %s\n", curLink->key, prevLink->key)
     struct HashLink* tmp;
     struct HashMap* new;   //creates entirely new hash map
     new = hashMapNew(capacity);
-
+    printf("TABLE RESIZE FUNCTION\n");
     while(i < map->capacity){
         tmp = map->table[i];
         while(tmp != 0){
+            printf("Current pointer being added to new map: %p\n", tmp);
             hashMapPut(new, tmp->key, tmp->value);
             tmp = tmp->next;
         }
@@ -239,7 +239,7 @@ printf("curLink key is: %s, prevLink key is: %s\n", curLink->key, prevLink->key)
  */
 void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCTION MAY NEED A REDISIGN.
 {
-    /*
+
     struct HashLink* ptr;                                                              //Create Hashlink pointer for iteration.
 
     int* link;
@@ -254,7 +254,7 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
             idx += map->capacity;
         }
         if(map->table[idx] != NULL){
-            ptr = map->table[idx]->next;
+            ptr = map->table[idx];
             map->table[idx] = hashLinkNew(key, value, ptr);
             map->size++;
         }
@@ -265,31 +265,30 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
     }
     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
-printf("going to the resize table function\n");
+        printf("going to the resize table function\n");
         resizeTable(map, (2 * map->capacity));                                        //Double the table size.
     }
     map->size++;
     // FIXME: implement
-*/
-if(hashMapContainsKey(map, key)){
-
-}
-else{
-    int idx = abs(HASH_MAP_H(key)) % map->capacity;
-    if(idx < 0){
-        idx += map->capacity;
-    }
-    map->table[idx] = hashLinkNew(key, value, map->table[idx]);
-    map->size++;
-    float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
-    if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
-printf("going to the resize table function\n");
-        resizeTable(map, (2 * map->capacity));                                        //Double the table size.
-    }
-
-}
-
-
+// if(hashMapContainsKey(map, key)){
+//
+// }
+// else{
+//     int idx = abs(HASH_MAP_H(key)) % map->capacity;
+//     if(idx < 0){
+//         idx += map->capacity;
+//     }
+//     map->table[idx] = hashLinkNew(key, value, map->table[idx]);
+//     map->size++;
+//     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
+//     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
+// printf("going to the resize table function\n");
+//         resizeTable(map, (2 * map->capacity));                                        //Double the table size.
+//     }
+//
+// }
+//
+//
 }
 
 /**
