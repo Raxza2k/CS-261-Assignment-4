@@ -169,40 +169,7 @@ int* hashMapGet(struct HashMap* map, const char* key)
  */
 void resizeTable(struct HashMap* map, int capacity)
 {
-/*
-    struct HashLink **oldTable = map->table;
-    int oldTableSize = hashMapCapacity(map);
-    int i;
-    HashLink *curLink;
-    HashLink *prevLink;
-    hashMapInit(map, capacity);
-printf("in the resize table function\n");
-    for(i = 0; i < oldTableSize; i++)
-	{
-            curLink = oldTable[i];
-printf(" curLink key, value: %s, %d\n", curLink->key, curLink->value);
-            while(curLink != 0)
-			{
-printf("in the while loop\n");
-                hashMapPut(map, curLink->key, curLink->value);
-printf("past the hash map put\n");
-                prevLink = curLink;
-printf("prevLink is now curLink and equals:%s, %d\n", prevLink->key, prevLink->value);
-                if(hashMapContainsKey(map, curLink->next->key) == 1){
-                    curLink = curLink->next;
-                }
-                else{
-                    curLink = NULL;
-                }
-printf("curLink key is: %s, prevLink key is: %s\n", curLink->key, prevLink->key);
-                hashLinkDelete(prevLink);
-            }
-            curLink = NULL;
-            prevLink = NULL;
-    }
 
-    free(oldTable);
-    */
     int i = 0;
     struct HashLink* tmp;
     struct HashMap* new;   //creates entirely new hash map
@@ -262,6 +229,7 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
             map->table[idx] = hashLinkNew(key, value, NULL);
             map->size++;
         }
+        curr = curr->next;
     }
     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
@@ -344,8 +312,8 @@ int hashMapContainsKey(struct HashMap* map, const char* key)
     struct HashLink* ptr;                                                              //Create pointer for link iteration.
     int idx = abs((HASH_FUNCTION(key)) % (map->capacity));                      //Determine the starting index of the search.
     ptr = map->table[idx];                                                      //Start looking for the value in the bucket it would be in.
-    while(ptr != NULL){                                                         //While not at the end of each bucket linked list
-        if(strcmp(key, ptr->key) != 0){                      //Converts both keys to ints and compares the values, if they're not equal moves pointer to next link
+    while(ptr != 0){                                                         //While not at the end of each bucket linked list
+        if(strcmp(key, ptr->key) != 0){                      //compares the values, if they're not equal moves pointer to next link
             ptr = ptr->next;
         }
         else {                                                                  //If the key values are equal
@@ -388,7 +356,7 @@ int hashMapEmptyBuckets(struct HashMap* map)
     int i, j;
     j = 0;
     for(i = 0; i < map->capacity; i++){
-        if(map->table[i] == 0)
+        if(map->table[i] == NULL)
             j++;
     }
     // FIXME: implement
