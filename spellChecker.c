@@ -59,7 +59,7 @@ void loadDictionary(FILE* file, struct HashMap* map)
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
         for(int i = 0; i < map->capacity; i++){
             if(i == idx){
-                hashMapPut(map, word, /*value*/);
+                hashMapPut(map, word, idx);
             }
         }
         word = nextWord(file);
@@ -140,13 +140,15 @@ int main(int argc, const char** argv)
     {
         printf("Enter a word or \"quit\" to quit: ");
         scanf("%s", inputBuffer);
-        char* tmp;
-        for(tmp = inputBuffer; tmp < strlen(inputBuffer); tmp++){         //puts user inputted word to lower case to aid comparisons
-            if(!isalpha(*tmp)){
+        char* tmp[strlen(inputBuffer)];
+        strcpy(tmp, inputBuffer);
+        int i = 0;
+        for(i = 0; i < strlen(inputBuffer); i++){                                 //puts user inputted word to lower case to aid comparisons
+            if(!isalpha(tmp[i])){
                 notWord = 1;
             }
             else{
-                tmp = tolower(*tmp);
+                tmp[i] = tolower(tmp[i]);
                 notWord = 0;
             }
         }
@@ -157,7 +159,7 @@ int main(int argc, const char** argv)
             for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
                 cur1 = map->table[i]->next;
                 while(cur1 != NULL){
-                    moves = leDist(word, cur1->key);  //not sure how to catch the return...maybe a hash map link
+                    moves = leDist(notWord, cur1->key);  //not sure how to catch the return...maybe a hash map link
                     if(moves == 0){
                         matching = 1;
                         printf("The word \"%s\" is spelled correctly. \n", inputBuffer);

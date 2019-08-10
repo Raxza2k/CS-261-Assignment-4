@@ -21,8 +21,7 @@ char* nextWord(FILE* file)
    while (1)
     {
         char c = fgetc(file);
-        if ((c >= 'A' && c <= 'Z') ||
-            (c >= 'a' && c <= 'z'))
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
         {
             if (length + 1 >= maxLength)
             {
@@ -74,14 +73,14 @@ int main(int argc, const char** argv)
 
     clock_t timer = clock();
 
-    HashMap* map = hashMapNew(10);
-    HashLink* ptr;
+    struct HashMap* map = hashMapNew(10);
+    struct HashLink* ptr;
 
     // --- Concordance code begins here ---
     word = nextWord(file);
     while(word != NULL){
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
-        ptr = map->table[idx]->next;
+        ptr = map->table[idx];
         while(ptr != NULL){
             if(strcmp(word, ptr->key) == 0){
                 ptr->value++;
