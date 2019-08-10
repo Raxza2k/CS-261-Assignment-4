@@ -79,21 +79,28 @@ int main(int argc, const char** argv)
     // --- Concordance code begins here ---
     word = nextWord(file);
     while(word != NULL){
-        printf("The current word is %s\n", word);
-        // int idx = abs(HASH_FUNCTION(word)) % map->capacity;
-        // ptr = map->table[idx];
-        hashMapPut(map, word, 1);
-        // if(ptr == NULL){ //The slot is empty, so add it.
-        //     hashMapPut(map, word, 1);
-        // }
-        // while(ptr != NULL){
-        //     if(strcmp(word, ptr->key) == 0){
-        //             ptr->value++;
-        //             ptr = NULL;
-        //     }
-        //     ptr = ptr->next;
-        // }
+        int idx = abs(HASH_FUNCTION(word)) % map->capacity;
+        ptr = map->table[idx];
+        while(ptr != NULL){
+            if(strcmp(word, ptr->key) == 0){
+                ptr->value++;
+                break;
+            }
+            else{
+                ptr = ptr->next;
+                if(ptr->next == NULL){
+                /*    struct HashLink* newLink = malloc(struct HashLink*);
+                    newLink->value = 1;
+                    newLink->key = word;
+                    newLink->next = NULL;
+                    ptr->next = newLink; */
+                    hashMapPut(map, word, 1);
+                    break;
+                }
+            }
+        }
         word = nextWord(file);
+
     }
     free(word);
     hashMapPrint(map);
