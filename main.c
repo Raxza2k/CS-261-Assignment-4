@@ -81,26 +81,18 @@ int main(int argc, const char** argv)
     while(word != NULL){
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
         ptr = map->table[idx];
-        while(ptr != NULL){
-            if(strcmp(word, ptr->key) == 0){
+        if(strcmp(word, ptr->key) == 0){
                 ptr->value++;
                 break;
-            }
-            else{
-                ptr = ptr->next;
-                if(ptr->next == NULL){
-                /*    struct HashLink* newLink = malloc(struct HashLink*);
-                    newLink->value = 1;
-                    newLink->key = word;
-                    newLink->next = NULL;
-                    ptr->next = newLink; */
-                    hashMapPut(map, word, 1);
-                    break;
-                }
+        }
+        else{
+            ptr = ptr->next;
+            if(ptr->next == NULL){
+                hashMapPut(map, word, 1);
+                break;
             }
         }
         word = nextWord(file);
-
     }
     free(word);
     hashMapPrint(map);
