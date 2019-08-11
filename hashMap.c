@@ -148,7 +148,7 @@ int* hashMapGet(struct HashMap* map, const char* key)
                 ptr = ptr->next;
             }
             else if(strcmp(key, ptr->key) == 0){                                                              //if the key values are equal, copies link value to temp pointer  //THIS COULD LEAD TO AN ERROR. The else if () is a safer bet.
-                temp = ptr->value;                                               //Assign the temp int as the value found.
+                temp = &(ptr->value);                                               //Assign the temp int as the value found.
                 return temp;                                                        //returns temp pointer to value in desired link
             }
         }
@@ -229,14 +229,14 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
             map->table[idx] = hashLinkNew(key, value, NULL);
             map->size++;
         }
-        curr = curr->next;
+        //curr = curr->next;
     }
     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
         printf("going to the resize table function\n");
         resizeTable(map, (2 * map->capacity));                                        //Double the table size.
     }
-    map->size++;
+    //map->size++;
     // FIXME: implement
 // if(hashMapContainsKey(map, key)){
 //
@@ -269,7 +269,6 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
 void hashMapRemove(struct HashMap* map, const char* key)
 {
     struct HashLink* cur;
-    struct HashLink* temp;
     struct HashLink* prev;                                                      //Create current, temporary, and previous HashLink pointers.
     int idx = abs((HASH_FUNCTION(key)) % (map->capacity));                      //Determine the starting index of the search.
     if(idx < 0){
@@ -289,12 +288,12 @@ void hashMapRemove(struct HashMap* map, const char* key)
             cur->value = 0;
             cur->key = NULL;
             hashLinkDelete(cur);
-            map->size--;
             break;
         }
         cur = cur->next;
     }
     // FIXME: implement
+    map->size -= 1;
 }
 
 /**
@@ -353,11 +352,12 @@ int hashMapCapacity(struct HashMap* map)
  */
 int hashMapEmptyBuckets(struct HashMap* map)
 {
-    int i, j;
+    int j;
     j = 0;
-    for(i = 0; i < map->capacity; i++){
-        if(map->table[i] == NULL)
-            j++;
+    for(int i = 0; i < map->capacity; i++){
+        if(map->table[i] == NULL){
+            j ++;
+        }
     }
     // FIXME: implement
     return j;
