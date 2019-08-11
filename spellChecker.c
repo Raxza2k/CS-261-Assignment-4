@@ -59,7 +59,7 @@ void loadDictionary(FILE* file, struct HashMap* map)
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
         for(int i = 0; i < map->capacity; i++){
             if(i == idx){
-                hashMapPut(map, word, idx);
+                hashMapPut(map, word, 0);
             }
         }
         word = nextWord(file);
@@ -77,8 +77,8 @@ int minMoves(int a, int b, int c){
     return c;
 }
 
-struct HashLink* leDist(const char* input, const char* key){   //returns the pointer to the link that contains the matching word?
-    int inLen, keyLen;
+int leDist(char* input, char* key){   //returns the pointer to the link that contains the matching word?
+    int inLen, keyLen, finVal;
     inLen = strlen(input);
     keyLen = strlen(key);
 
@@ -104,9 +104,10 @@ struct HashLink* leDist(const char* input, const char* key){   //returns the poi
                 int sub = mtrx[i - 1][j - 1] + 1;
                 mtrx[i][j] = minMoves(del, ins, sub);
             }
+            finVal = mtrx[i][j];
         }
     }
-
+return finVal;
 }
 
 
@@ -140,15 +141,15 @@ int main(int argc, const char** argv)
     {
         printf("Enter a word or \"quit\" to quit: ");
         scanf("%s", inputBuffer);
-        char* tmp[strlen(inputBuffer)];
+        char tmp[strlen(inputBuffer) + 1];
         strcpy(tmp, inputBuffer);
         int i = 0;
         for(i = 0; i < strlen(inputBuffer); i++){                                 //puts user inputted word to lower case to aid comparisons
-            if(!isalpha(tmp[i])){
+            if(isalpha(tmp[i]) == 1){
                 notWord = 1;
             }
-            else{
-                tmp[i] = tolower(tmp[i]);
+            else if(tmp[i] >= 'A' && tmp[i] <= 'Z'){
+                tmp[i] += 32;
                 notWord = 0;
             }
         }
@@ -157,9 +158,9 @@ int main(int argc, const char** argv)
 
             int matching;
             for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
-                cur1 = map->table[i]->next;
+                cur1 = map->table[i];
                 while(cur1 != NULL){
-                    moves = leDist(notWord, cur1->key);  //not sure how to catch the return...maybe a hash map link
+                    moves = leDist(inputBuffer, cur1->key);  //not sure how to catch the return...maybe a hash map link
                     if(moves == 0){
                         matching = 1;
                         printf("The word \"%s\" is spelled correctly. \n", inputBuffer);
@@ -176,7 +177,7 @@ int main(int argc, const char** argv)
                 int count = 0;
                 struct HashLink* minArr[5];        //creates hashlink array to hold the locations of the five closest words
                 for(int j = 0; j < map->capacity; j++){
-                    cur2 = map->table[j]->next;
+                    cur2 = map->table[j];
                     while(cur2 != NULL){
                         if(count < 5){      //fills the array with the first five words
                             minArr[count] = cur2;
@@ -184,7 +185,7 @@ int main(int argc, const char** argv)
                         }
                         else{
                             for(int k = 0; k < 5; k++){     //compares every word distance with distances in the array
-                                if(cur2->value < minArr[k]){
+                                if(cur2->value < minArr[k]->value){
                                     minArr[k] = cur2;       //once a new distance is placed in an array location, jump out of array comparison loop
                                     break;
                                 }
@@ -192,7 +193,7 @@ int main(int argc, const char** argv)
                         }
                     }
                 }
-                printf("The inputted word:%s, is spelled incorrectly, did you mean; %s, %s, %s, %s, %s?\n", inputBuffer, minArr[0], minArr[1], minArr[2], minArr[3], minArr[4]);
+                printf("The inputted word:%s, is spelled incorrectly, did you mean; %s, %s, %s, %s, %s?\n", inputBuffer, minArr[0]->key, minArr[1]->key, minArr[2]->key, minArr[3]->key, minArr[4]->key);
             }
         }
 
