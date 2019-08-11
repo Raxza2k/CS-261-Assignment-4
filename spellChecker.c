@@ -154,6 +154,12 @@ int main(int argc, const char** argv)
             }
         }
 
+        if (strcmp(inputBuffer, "quit") == 0)
+        {
+            quit = 1;
+            break;
+        }
+
         if(notWord == 0){
 
             int matching;
@@ -164,8 +170,9 @@ int main(int argc, const char** argv)
                     if(moves == 0){
                         matching = 1;
                         printf("The word \"%s\" is spelled correctly. \n", inputBuffer);
+                        break;
                     }
-                    else{
+                    else if(moves != 0){
                         matching = 0;
                         cur1->value = moves;
                     }
@@ -199,10 +206,7 @@ int main(int argc, const char** argv)
 
         // Implement the spell checker code here..
 
-        if (strcmp(inputBuffer, "quit") == 0)
-        {
-            quit = 1;
-        }
+
     }
 
     hashMapDelete(map);
