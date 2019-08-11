@@ -174,11 +174,9 @@ void resizeTable(struct HashMap* map, int capacity)
     struct HashLink* tmp;
     struct HashMap* new;   //creates entirely new hash map
     new = hashMapNew(capacity);
-    printf("TABLE RESIZE FUNCTION\n");
     while(i < map->capacity){
         tmp = map->table[i];
         while(tmp != 0){
-            printf("Current pointer being added to new map: %p\n", tmp);
             hashMapPut(new, tmp->key, tmp->value);
             tmp = tmp->next;
         }
@@ -233,30 +231,9 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
     }
     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
-        printf("going to the resize table function\n");
         resizeTable(map, (2 * map->capacity));                                        //Double the table size.
     }
-    //map->size++;
-    // FIXME: implement
-// if(hashMapContainsKey(map, key)){
-//
-// }
-// else{
-//     int idx = abs(HASH_MAP_H(key)) % map->capacity;
-//     if(idx < 0){
-//         idx += map->capacity;
-//     }
-//     map->table[idx] = hashLinkNew(key, value, map->table[idx]);
-//     map->size++;
-//     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
-//     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
-// printf("going to the resize table function\n");
-//         resizeTable(map, (2 * map->capacity));                                        //Double the table size.
-//     }
-//
-// }
-//
-//
+
 }
 
 /**
@@ -390,7 +367,7 @@ void hashMapPrint(struct HashMap* map)
         temp = map->table[i];
         printf("Bucket %d\n", i);
         while(temp != NULL){
-            printf("Key: %s |\n", temp->key);
+            printf("Key: %s \n", temp->key);
             printf("Value:%d \n", temp->value);
             temp = temp->next;
         }

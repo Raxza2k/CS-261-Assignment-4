@@ -68,25 +68,49 @@ void loadDictionary(FILE* file, struct HashMap* map)
 }
 
 int minMoves(int a, int b, int c){
-    if(a < b && a < c){
+    if(a <= b && a <= c){
         return a;
     }
-    if(b < a && b < c){
+    if(b <= a && b <= c){
         return b;
     }
     return c;
 }
 
+
+int levDist(const char* input, int inLen,const char* word, int keyLen){
+    int cost;
+
+    if(inLen == 0)
+        return keyLen;
+    if(keyLen == 0)
+        return inLen;
+
+    if(input[inLen - 1] == word[keyLen - 1]){
+        cost = 0;
+    }
+    else{
+        cost = 1;
+    }
+
+    int one = levDist(input, inLen - 1, word, keyLen) + 1;
+    int two = levDist(input, inLen, word, keyLen - 1) + 1;
+    int three = levDist(input, inLen - 1, word, keyLen - 1) + cost;
+    return minMoves(one, two, three);
+}
+
+/*
 int leDist(char* input, char* key){   //returns the pointer to the link that contains the matching word?
     int inLen, keyLen, finVal;
     inLen = strlen(input);
     keyLen = strlen(key);
+    printf("checking %s against %s\n", input, key);
 
     int mtrx[inLen + 1][keyLen + 1];
-    for(int i = 0; i <= inLen; i ++){   //rows
+    for(int i = 0; i <= inLen; i++){   //rows
         mtrx[i][0] = i;
     }
-    for(int i = 0; i <= keyLen; i ++){  //columns
+    for(int i = 0; i <= keyLen; i++){  //columns
         mtrx[0][i] = i;
     }
     for(int i = 1; i <= inLen; i++){
@@ -109,7 +133,7 @@ int leDist(char* input, char* key){   //returns the pointer to the link that con
     }
 return finVal;
 }
-
+*/
 
 /**
  * Prints the concordance of the given file and performance information. Uses
@@ -134,10 +158,10 @@ int main(int argc, const char** argv)
     timer = clock() - timer;
     printf("Dictionary loaded in %f seconds\n", (float)timer / (float)CLOCKS_PER_SEC);
     fclose(file);
-
+printf("hash map size: %d\n", hashMapSize(map));
     char inputBuffer[256];
     int quit = 0;
-    while (!quit)
+    while (quit == 0)
     {
         printf("Enter a word or \"quit\" to quit: ");
         scanf("%s", inputBuffer);
@@ -162,11 +186,14 @@ int main(int argc, const char** argv)
 
         if(notWord == 0){
 
-            int matching;
+            int matching, len1, len2;
+            len1 = strlen(inputBuffer + 1);
             for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
                 cur1 = map->table[i];
+                len2 = strlen(cur1->key + 1);
                 while(cur1 != NULL){
-                    moves = leDist(inputBuffer, cur1->key);  //not sure how to catch the return...maybe a hash map link
+
+                    moves = levDist(inputBuffer, len1, cur1->key, len2);  //not sure how to catch the return...maybe a hash map link
                     if(moves == 0){
                         matching = 1;
                         printf("The word \"%s\" is spelled correctly. \n", inputBuffer);
@@ -187,13 +214,16 @@ int main(int argc, const char** argv)
                     cur2 = map->table[j];
                     while(cur2 != NULL){
                         if(count < 5){      //fills the array with the first five words
-                            minArr[count] = cur2;
+                            minArr[count]->key = cur2->key;
+                            minArr[count]->value = cur2->value;
+                            minArr[count]->next = NULL;
                             count++;
                         }
                         else{
                             for(int k = 0; k < 5; k++){     //compares every word distance with distances in the array
                                 if(cur2->value < minArr[k]->value){
-                                    minArr[k] = cur2;       //once a new distance is placed in an array location, jump out of array comparison loop
+                                    minArr[k]->key = cur2->key;       //once a new distance is placed in an array location, jump out of array comparison loop
+                                    minArr[k]->value = cur2->value;
                                     break;
                                 }
                             }
