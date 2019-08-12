@@ -54,6 +54,7 @@ char* nextWord(FILE* file)
  */
 void loadDictionary(FILE* file, struct HashMap* map)
 {
+    printf("Loading dictionary, please wait...\n");
     char* word = nextWord(file);
     while(word != NULL){
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
@@ -149,7 +150,8 @@ int main(int argc, const char** argv)
     struct HashMap* map = hashMapNew(1000);
     struct HashLink* cur1;
     struct HashLink* cur2;
-    int moves, notWord;
+    int moves;
+    int notWord;
 
 
     FILE* file = fopen("dictionary.txt", "r");
@@ -158,11 +160,12 @@ int main(int argc, const char** argv)
     timer = clock() - timer;
     printf("Dictionary loaded in %f seconds\n", (float)timer / (float)CLOCKS_PER_SEC);
     fclose(file);
-printf("hash map size: %d\n", hashMapSize(map));
+    printf("hash map size: %d\n", hashMapSize(map));
     char inputBuffer[256];
     int quit = 0;
     while (quit == 0)
     {
+        printf("Inside the quit determined while loop\n");
         printf("Enter a word or \"quit\" to quit: ");
         scanf("%s", inputBuffer);
         char tmp[strlen(inputBuffer) + 1];
@@ -184,15 +187,22 @@ printf("hash map size: %d\n", hashMapSize(map));
             break;
         }
 
+        assert(map != NULL);
+
         if(notWord == 0){
-
-            int matching, len1, len2;
-            len1 = strlen(inputBuffer + 1);
+            printf("Inside the notWord determined while loop\n");
+            int matching;
+            int len2;
+            int len1 = strlen(inputBuffer) + 1;
             for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
+                printf("Iterating through table to search through word, iteration: %d", i);
                 cur1 = map->table[i];
-                len2 = strlen(cur1->key + 1);
+                printf("The current table pointer is: %p", cur1);
+                len2 = strlen(cur1->key) + 1;
                 while(cur1 != NULL){
-
+                    assert(cur1 != NULL);
+                    printf("Inside the cur1 determined while loop\n");
+                    printf("The current searching in pointer is: %p", cur1);
                     moves = levDist(inputBuffer, len1, cur1->key, len2);  //not sure how to catch the return...maybe a hash map link
                     if(moves == 0){
                         matching = 1;
