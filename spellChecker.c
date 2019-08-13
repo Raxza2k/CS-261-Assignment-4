@@ -57,6 +57,7 @@ void loadDictionary(FILE* file, struct HashMap* map)
     printf("Loading dictionary, please wait...\n");
     char* word = nextWord(file);
     while(word != NULL){
+        printf("Current word: %s\n", word);
         int idx = abs(HASH_FUNCTION(word)) % map->capacity;
         for(int i = 0; i < map->capacity; i++){
             if(i == idx){
@@ -163,21 +164,24 @@ int main(int argc, const char** argv)
     printf("hash map size: %d\n", hashMapSize(map));
     char inputBuffer[256];
     int quit = 0;
+    int matching = 0;
     while (quit == 0)
     {
         printf("Inside the quit determined while loop\n");
         printf("Enter a word or \"quit\" to quit: ");
         scanf("%s", inputBuffer);
-        char tmp[strlen(inputBuffer) + 1];
-        strcpy(tmp, inputBuffer);
+        // char tmp[strlen(inputBuffer) + 1];
+        // strcpy(tmp, inputBuffer);
         int i = 0;
+        notWord = 0;
         for(i = 0; i < strlen(inputBuffer); i++){                                 //puts user inputted word to lower case to aid comparisons
-            if(isalpha(tmp[i]) == 1){
+// printf("%s\n", inputBuffer);
+            if(isalpha(inputBuffer[i]) == 0){
                 notWord = 1;
+                break;
             }
-            else if(tmp[i] >= 'A' && tmp[i] <= 'Z'){
-                tmp[i] += 32;
-                notWord = 0;
+            if(inputBuffer[i] >=  'A' && inputBuffer[i] <= 'Z'){
+                inputBuffer[i] += 32;
             }
         }
 
@@ -186,36 +190,32 @@ int main(int argc, const char** argv)
             quit = 1;
             break;
         }
-
+printf("%s\n", inputBuffer);
         assert(map != NULL);
 
         if(notWord == 0){
-            printf("Inside the notWord determined while loop\n");
-            int matching;
+            // printf("Inside the notWord determined while loop\n");
             int len2;
-            int len1 = strlen(inputBuffer) + 1;
+            int len1 = strlen(inputBuffer);
             for(int i = 0; i < map->capacity; i++){     //iterates through all buckets(sentinels)
-                printf("Iterating through table to search through word, iteration: %d", i);
                 cur1 = map->table[i];
-                printf("The current table pointer is: %p", cur1);
-                len2 = strlen(cur1->key) + 1;
                 while(cur1 != NULL){
                     assert(cur1 != NULL);
-                    printf("Inside the cur1 determined while loop\n");
-                    printf("The current searching in pointer is: %p", cur1);
+                    len2 = strlen(cur1->key);
                     moves = levDist(inputBuffer, len1, cur1->key, len2);  //not sure how to catch the return...maybe a hash map link
                     if(moves == 0){
                         matching = 1;
                         printf("The word \"%s\" is spelled correctly. \n", inputBuffer);
                         break;
                     }
-                    else if(moves != 0){
+                    else{
                         matching = 0;
                         cur1->value = moves;
+                        cur1 = cur1->next;
                     }
-                    cur1 = cur1->next;
                 }
-            }
+                if(matching == 1) {break;}
+             }
 
             if(matching == 0){
                 int count = 0;
@@ -241,14 +241,12 @@ int main(int argc, const char** argv)
                     }
                 }
                 printf("The inputted word:%s, is spelled incorrectly, did you mean; %s, %s, %s, %s, %s?\n", inputBuffer, minArr[0]->key, minArr[1]->key, minArr[2]->key, minArr[3]->key, minArr[4]->key);
+
+              }
             }
-        }
 
         // Implement the spell checker code here..
-
-
     }
-
     hashMapDelete(map);
     return 0;
 }

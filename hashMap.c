@@ -169,7 +169,7 @@ int* hashMapGet(struct HashMap* map, const char* key)
  */
 void resizeTable(struct HashMap* map, int capacity)
 {
-
+    printf("RESIZING TABLE\n");
     int i = 0;
     struct HashLink* tmp;
     struct HashMap* new;   //creates entirely new hash map
@@ -177,6 +177,7 @@ void resizeTable(struct HashMap* map, int capacity)
     while(i < map->capacity){
         tmp = map->table[i];
         while(tmp != 0){
+            // printf("Current resize pointer: %p\n", tmp);
             hashMapPut(new, tmp->key, tmp->value);
             tmp = tmp->next;
         }
@@ -204,7 +205,7 @@ void resizeTable(struct HashMap* map, int capacity)
  */
 void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCTION MAY NEED A REDISIGN.
 {
-
+    printf("Adding key: %s\n", key);
     struct HashLink* ptr;                                                              //Create Hashlink pointer for iteration.
 
     int* link;
@@ -223,12 +224,13 @@ void hashMapPut(struct HashMap* map, const char* key, int value)    //THIS FUNCT
             map->table[idx] = hashLinkNew(key, value, ptr);
             map->size++;
         }
-        else{
+        if(map->table[idx] == NULL){
             map->table[idx] = hashLinkNew(key, value, NULL);
             map->size++;
         }
         //curr = curr->next;
     }
+    // printf("Calculating table load.\n");
     float temp = hashMapTableLoad(map);                                         //Set that float equal to the table load.
     if(temp >= MAX_TABLE_LOAD){                                                 //If table load is too high, like the rent,...
         resizeTable(map, (2 * map->capacity));                                        //Double the table size.
